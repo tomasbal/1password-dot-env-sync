@@ -1,0 +1,29 @@
+{
+  "name": "1password-env-sync",
+  "version": "1.0.0",
+  "description": "Sync secrets between .env and 1Password vault",
+  "main": "src/index.js",
+  "bin": {
+    "1password-env-sync": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js"
+  },
+  "keywords": [
+    "1password",
+    "env",
+    "sync",
+    "secrets"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@1password/sdk": "^0.1.1",
+    "commander": "^12.1.0",
+    "diff": "^5.2.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^10.1.8",
+    "js-yaml": "^4.1.0",
+    "kleur": "^4.1.5"
+  }
+}
