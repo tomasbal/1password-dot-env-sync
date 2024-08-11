@@ -113,6 +113,12 @@ The tool uses a configuration file to manage settings. By default, it looks for 
 - **logger.ts**: Provides logging functionality across the application.
 - **utils.ts**: Utility functions used throughout the application.
 
+
+### How to contribute
+This project is actively looking for maintainers, so feel free to reach out to me if you want to contribute to it.
+
+E-mail: [contact@tomislavbalabanov.me](mailto:contact@tomislavbalabanov.me)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
