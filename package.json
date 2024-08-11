@@ -10,7 +10,8 @@
     "build": "tsc",
     "prepare": "npm run build",
     "watch": "tsc -w",
-    "start": "node dist/cli.js"
+    "start": "node dist/cli.js",
+    "lint": "tsc"
   },
   "keywords": [
     "1password",
@@ -26,20 +27,18 @@
   "license": "MIT",
   "dependencies": {
     "@1password/sdk": "^0.1.1",
+    "@inquirer/prompts": "^5.3.8",
     "commander": "^12.1.0",
     "diff": "^5.2.0",
     "dotenv": "^16.4.5",
-    "inquirer": "^10.1.8",
     "js-yaml": "^4.1.0",
     "kleur": "^4.1.5"
   },
   "devDependencies": {
-    "@types/commander": "^2.12.2",
     "@types/diff": "^5.2.1",
-    "@types/dotenv": "^8.2.0",
-    "@types/inquirer": "^9.0.7",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.2.0",
+    "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   }
 }

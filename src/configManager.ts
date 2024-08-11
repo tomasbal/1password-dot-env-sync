@@ -4,7 +4,7 @@ import yaml from 'js-yaml';
 import { select, input } from "@inquirer/prompts";
 import { logger } from './logger';
 
-const CONFIG_FILE_NAME = '1pass.yaml';
+const CONFIG_FILE_NAME = 'op-sync.yaml';
 
 interface Config {
   token: string;

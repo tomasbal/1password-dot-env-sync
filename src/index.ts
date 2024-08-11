@@ -1,8 +1,8 @@
 import { Command } from 'commander';
-import { checkEnvFile, parseEnvSecrets, listEnvFiles } from './envManager';
+import { parseEnvSecrets, listEnvFiles } from './envManager';
 import { selectVault, initializeOnePassword } from './onePasswordManager';
 import { syncEnvToOnePassword, syncOnePasswordToEnv, showDifferences } from './syncManager';
-import { askSyncDirection, promptForProjectPrefix, selectEnvFile } from './utils';
+import { askSyncDirection, selectEnvFile } from './utils';
 import { generateConfigTemplate } from './configManager';
 import { logger } from './logger';
 
