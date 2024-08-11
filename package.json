@@ -11,16 +11,22 @@
     "prepare": "npm run build",
     "watch": "tsc -w",
     "start": "node dist/cli.js",
-    "lint": "tsc"
+    "lint": "tsc",
+    "release": "npm release"
   },
   "keywords": [
     "1password",
     "env",
     "sync",
-    "secrets"
+    "secrets",
+    "dotenv",
+    ".env",
+    "onepassword",
+    "one password",
+    "1 password"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "engineStrict": true,
   "author": "Tomislav Balabanov",
