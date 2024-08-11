@@ -4,8 +4,12 @@ import yaml from 'js-yaml';
 import { select, input } from "@inquirer/prompts";
 import { logger } from './logger';
 
+// Name of the configuration file
 const CONFIG_FILE_NAME = 'op-sync.yaml';
 
+/**
+ * Interface defining the structure of the configuration object
+ */
 interface Config {
   token: string;
   storageMode: 'separate' | 'combined';
@@ -13,6 +17,11 @@ interface Config {
   [key: string]: any;  // Allow for additional properties
 }
 
+/**
+ * Loads and validates the configuration from the YAML file
+ * @returns {Promise<Config>} A promise that resolves to the validated configuration object
+ * @throws {Error} If the configuration file is missing or invalid
+ */
 async function loadConfig(): Promise<Config> {
   const configPath = path.join(process.cwd(), CONFIG_FILE_NAME);
   try {
@@ -36,13 +45,9 @@ async function loadConfig(): Promise<Config> {
       throw new Error(`${CONFIG_FILE_NAME}: Please replace the placeholder token with your actual 1Password service account token`);
     }
 
-    if (!config.storageMode || (config.storageMode !== 'separate' && config.storageMode !== 'combined')) {
-      config.storageMode = 'separate';  // Default to 'separate' if not set or invalid
-    }
-
-    if (!config.projectPrefix) {
-      config.projectPrefix = '';  // Default to empty string if not set
-    }
+    // Set default values for optional fields
+    config.storageMode = config.storageMode === 'combined' ? 'combined' : 'separate';
+    config.projectPrefix = config.projectPrefix || '';
 
     return config;
   } catch (error) {
@@ -53,6 +58,10 @@ async function loadConfig(): Promise<Config> {
   }
 }
 
+/**
+ * Generates a configuration template file
+ * @returns {Promise<void>}
+ */
 async function generateConfigTemplate(): Promise<void> {
   const configPath = path.join(process.cwd(), CONFIG_FILE_NAME);
 
@@ -92,6 +101,7 @@ async function generateConfigTemplate(): Promise<void> {
     }
   }
 
+  // Prompt user for configuration details
   logger.info('\nYou can provide the 1Password service account token now or leave it empty and fill it in later.');
   logger.info('If left empty, a placeholder value will be used in the file.');
 
@@ -111,6 +121,7 @@ async function generateConfigTemplate(): Promise<void> {
     message: 'Enter a project prefix for 1Password items (or leave empty):',
   });
 
+  // Generate the configuration template
   const template = `# 1Password configuration
 token: ${token || '<replace_me_with_token>'}
 storageMode: ${storageMode}
@@ -128,6 +139,11 @@ projectPrefix: ${projectPrefix || ''}
   }
 }
 
+/**
+ * Updates the configuration file with new values
+ * @param {Partial<Config>} updates - Object containing the fields to update
+ * @returns {Promise<void>}
+ */
 async function updateConfig(updates: Partial<Config>): Promise<void> {
   const configPath = path.join(process.cwd(), CONFIG_FILE_NAME);
   try {

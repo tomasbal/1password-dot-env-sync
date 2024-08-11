@@ -1,13 +1,24 @@
 import { createClient, Client, VaultOverview } from "@1password/sdk";
 import { password, select } from "@inquirer/prompts";
 import { loadConfig } from './configManager';
-import { logger } from './logger'; // Make sure to import the logger
+import { logger } from './logger';
 
+/**
+ * Interface for options that may contain a 1Password token
+ */
 interface Options {
   opToken?: string;
   [key: string]: any;
 }
 
+/**
+ * Retrieves the 1Password service account token from various sources.
+ * Priority: config file > environment variable > command line option > user input
+ *
+ * @param {Options} options - Options object that may contain the token
+ * @returns {Promise<string>} The 1Password service account token
+ * @throws {Error} If no token is provided or found
+ */
 async function getCredentials(options: Options): Promise<string> {
   let token: string | undefined;
 
@@ -33,6 +44,13 @@ async function getCredentials(options: Options): Promise<string> {
   return token;
 }
 
+/**
+ * Initializes the 1Password client using the provided or retrieved token.
+ *
+ * @param {Options} options - Options object that may contain the token
+ * @returns {Promise<Client>} Initialized 1Password client
+ * @throws {Error} If client initialization fails
+ */
 async function initializeOnePassword(options: Options): Promise<Client> {
   try {
     const token = await getCredentials(options);
@@ -55,6 +73,13 @@ async function initializeOnePassword(options: Options): Promise<Client> {
   }
 }
 
+/**
+ * Prompts the user to select a vault from the available vaults in their 1Password account.
+ *
+ * @param {Client} client - Initialized 1Password client
+ * @returns {Promise<VaultOverview>} Selected vault overview
+ * @throws {Error} If the selected vault is not found
+ */
 async function selectVault(client: Client): Promise<VaultOverview> {
   logger.info('Fetching available vaults...');
   const vaultsIterable = await client.vaults.listAll();

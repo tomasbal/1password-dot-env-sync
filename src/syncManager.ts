@@ -15,6 +15,12 @@ import { loadConfig, updateConfig, Config } from './configManager';
 import { getStorageMode } from "./utils";
 import { input } from "@inquirer/prompts";
 
+/**
+ * Ensures that a project prefix is set in the configuration.
+ * If not set, prompts the user to enter one.
+ *
+ * @returns {Promise<string>} The project prefix
+ */
 async function ensureProjectPrefix(): Promise<string> {
   const config = await loadConfig();
   if (!config.projectPrefix) {
@@ -28,6 +34,14 @@ async function ensureProjectPrefix(): Promise<string> {
   return config.projectPrefix;
 }
 
+/**
+ * Synchronizes secrets from .env file to 1Password.
+ *
+ * @param {Client} client - 1Password client
+ * @param {VaultOverview} vault - Selected vault
+ * @param {Record<string, string>} secrets - Secrets from .env file
+ * @param {string} selectedEnvFile - Name of the selected .env file
+ */
 async function syncEnvToOnePassword(client: Client, vault: VaultOverview, secrets: Record<string, string>, selectedEnvFile: string): Promise<void> {
   const config = await loadConfig();
   const mode = await getStorageMode(config);
@@ -40,6 +54,13 @@ async function syncEnvToOnePassword(client: Client, vault: VaultOverview, secret
   }
 }
 
+/**
+ * Synchronizes secrets as separate items in 1Password.
+ *
+ * @param {Client} client - 1Password client
+ * @param {VaultOverview} vault - Selected vault
+ * @param {Record<string, string>} secrets - Secrets to sync
+ */
 async function syncAsSeparateItems(client: Client, vault: VaultOverview, secrets: Record<string, string>): Promise<void> {
   const items = await client.items.listAll(vault.id);
   let updatedSecrets: string[] = [];
@@ -84,6 +105,7 @@ async function syncAsSeparateItems(client: Client, vault: VaultOverview, secrets
     }
   }
 
+  // Log results
   if (updatedSecrets.length > 0 || createdSecrets.length > 0) {
     logger.info('Secrets synced in 1Password:');
     if (updatedSecrets.length > 0) {
@@ -97,6 +119,14 @@ async function syncAsSeparateItems(client: Client, vault: VaultOverview, secrets
   }
 }
 
+/**
+ * Synchronizes secrets as a combined item in 1Password.
+ *
+ * @param {Client} client - 1Password client
+ * @param {VaultOverview} vault - Selected vault
+ * @param {Record<string, string>} secrets - Secrets to sync
+ * @param {string} projectPrefix - Project prefix for the combined item
+ */
 async function syncAsCombinedItem(client: Client, vault: VaultOverview, secrets: Record<string, string>, projectPrefix: string): Promise<void> {
   const items = await client.items.listAll(vault.id);
 
@@ -104,6 +134,7 @@ async function syncAsCombinedItem(client: Client, vault: VaultOverview, secrets:
   let updatedSecrets: string[] = [];
   let createdSecrets: string[] = [];
 
+  // Prepare fields
   if (Object.entries(secrets).length > 0) {
     for (const [key, value] of Object.entries(secrets)) {
       fields.push({
@@ -177,6 +208,13 @@ async function syncAsCombinedItem(client: Client, vault: VaultOverview, secrets:
   }
 }
 
+/**
+ * Synchronizes secrets from 1Password to .env file.
+ *
+ * @param {Client} client - 1Password client
+ * @param {VaultOverview} vault - Selected vault
+ * @param {string} selectedEnvFile - Name of the selected .env file
+ */
 async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, selectedEnvFile: string): Promise<void> {
   const config = await loadConfig();
   const mode = await getStorageMode(config);
@@ -184,6 +222,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
   const items = await client.items.listAll(vault.id);
   const onePasswordSecrets: Record<string, string> = {};
 
+  // Fetch secrets from 1Password based on storage mode
   if (mode === 'separate') {
     for await (const item of items) {
       if (item.category === ItemCategory.Password) {
@@ -210,6 +249,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
     }
   }
 
+  // Read and process .env file
   const envPath = path.join(process.cwd(), selectedEnvFile);
   const envContent = await fs.readFile(envPath, 'utf8');
   const envLines = envContent.split('\n');
@@ -257,7 +297,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
     i++;
   }
 
-  // Add new keys
+  // Add new keys from 1Password that are not in .env
   for (const [key, value] of Object.entries(onePasswordSecrets)) {
     if (!processedKeys.has(key)) {
       if (updatedEnvLines[updatedEnvLines.length - 1] !== '') {
@@ -271,7 +311,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
   // Write updated content back to file
   await fs.writeFile(envPath, updatedEnvLines.join('\n') + '\n');
 
-
+  // Log results
   if (updatedSecrets.length > 0 || addedSecrets.length > 0) {
     logger.info('Secrets synced from 1Password to .env:');
     if (updatedSecrets.length > 0) {
@@ -287,6 +327,14 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
   logger.success(`Sync from 1Password to ${selectedEnvFile} completed.`);
 }
 
+/**
+ * Shows differences between .env file and 1Password secrets.
+ *
+ * @param {Client} client - 1Password client
+ * @param {VaultOverview} vault - Selected vault
+ * @param {Record<string, string>} envSecrets - Secrets from .env file
+ * @param {string} selectedEnvFile - Name of the selected .env file
+ */
 async function showDifferences(client: Client, vault: VaultOverview, envSecrets: Record<string, string>, selectedEnvFile: string): Promise<void> {
   const config = await loadConfig();
   const mode = await getStorageMode(config);
@@ -294,6 +342,7 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
   const items = await client.items.listAll(vault.id);
   const onePasswordSecrets: Record<string, string> = {};
 
+  // Fetch secrets from 1Password based on storage mode
   if (mode === 'separate') {
     for await (const item of items) {
       if (item.category === ItemCategory.Password) {
@@ -340,6 +389,7 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
     }
   }
 
+  // Display differences or inform if no differences found
   if (diffContent) {
     logger.info('Differences found:');
     console.log(diffContent); // Keeping this as console.log for better formatting
@@ -348,7 +398,13 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
   }
 }
 
-
+/**
+ * Formats the value of a secret for display or storage.
+ * Handles multiline values, JSON-like strings, and values with spaces or quotes.
+ *
+ * @param {string} value - The value to format
+ * @returns {string} The formatted value
+ */
 function formatValue(value: string) {
   if (typeof value !== 'string') {
     return value;
