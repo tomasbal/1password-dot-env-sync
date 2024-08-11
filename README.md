@@ -20,13 +20,17 @@ Here is the fully updated README file:
 1. **Support for Multiple .env Files**:
     - Future releases will support syncing across multiple environment files (e.g., `local`, `prod`, `dev`).
 
-2. **Vault Creation**:
+2. **Support sub directory .env files**:
+   -  Future releases will support the ability to sync .env files that are in subdirectories within the project root.
+
+3**Vault Creation**:
     - When the 1Password SDK supports it, we will add the ability to create new vaults directly from the CLI.
 
-3. **Extended CLI Commands with Flags**:
+4**Extended CLI Commands with Flags**:
     - We plan to extend the CLI with more commands and flags to enhance the flexibility and usability of the tool.
 
-## Getting Started
+
+## Getting Started - Local Development
 
 ### Prerequisites
 
@@ -72,8 +76,14 @@ To start developing or modifying the tool locally, follow these steps:
 
 ### Usage
 
-To sync your `.env` file with a 1Password vault, simply run the following command:
+To start using the tool and to sync your `.env` file with a 1Password vault, simply run the following command:
+```bash
+npx 1password-env-sync init
+```
+This will initiate the setup of the tool and prompt you to configure the 1Password service account connection (if you don't know how to create 1password token you can find the instructions on the following [Link](https://developer.1password.com/docs/service-accounts/get-started)).
 
+
+After the setup is complete, you can sync your `.env` file with the 1Password vault by running:
 ```bash
 npx 1password-env-sync sync
 ```

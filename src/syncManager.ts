@@ -189,7 +189,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
       if (item.category === ItemCategory.Password) {
         const fullItem = await client.items.get(item.vaultId, item.id);
         const passwordField = fullItem.fields?.find(field => field.id === 'password');
-        if (passwordField) {
+        if (passwordField && passwordField.value.trim() !== '') {
           onePasswordSecrets[item.title] = passwordField.value;
         }
       }
@@ -203,41 +203,77 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
     if (combinedItem) {
       const fullItem = await client.items.get(combinedItem.vaultId, combinedItem.id);
       fullItem.fields?.forEach(field => {
-        onePasswordSecrets[field.title] = field.value;
+        if (field.value.trim() !== '') {
+          onePasswordSecrets[field.title] = field.value;
+        }
       });
     }
   }
 
   const envPath = path.join(process.cwd(), selectedEnvFile);
-  let envContent = await fs.readFile(envPath, 'utf8');
+  const envContent = await fs.readFile(envPath, 'utf8');
+  const envLines = envContent.split('\n');
 
   let updatedSecrets: string[] = [];
   let addedSecrets: string[] = [];
+  const processedKeys = new Set<string>();
 
-  for (const [key, value] of Object.entries(onePasswordSecrets)) {
-    const regex = new RegExp(`^${key}=.*$`, 'm');
+  const updatedEnvLines: string[] = [];
+  let i = 0;
+  while (i < envLines.length) {
+    let line = envLines[i].trimEnd();  // Trim end to remove trailing spaces but keep indentation
+    const match = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)=(.*)/);
 
-    if (regex.test(envContent)) {
-      // Update existing key
-      const oldValue = envContent.match(regex)?.[0].split('=')[1];
-      if (oldValue !== formatValue(value)) {
-        envContent = envContent.replace(regex, `${key}=${formatValue(value)}`);
-        updatedSecrets.push(key);
+    if (match) {
+      const [, key, oldValue] = match;
+      if (onePasswordSecrets.hasOwnProperty(key)) {
+        processedKeys.add(key);
+        const newValue = formatValue(onePasswordSecrets[key]);
+
+        if (oldValue.trim() !== newValue.trim()) {
+          updatedSecrets.push(key);
+          // Preserve the original indentation
+          const indentation = line.match(/^\s*/)?.[0] || '';
+          updatedEnvLines.push(`${indentation}${key}=${newValue}`);
+        } else {
+          updatedEnvLines.push(line);
+        }
+
+        // Handle multiline values
+        if (newValue.includes('\n')) {
+          i++;
+          while (i < envLines.length && !envLines[i].match(/^[a-zA-Z_][a-zA-Z0-9_]*=/)) {
+            i++;
+          }
+          i--; // Adjust for the outer loop increment
+        }
+      } else {
+        updatedEnvLines.push(line);
       }
     } else {
-      // Add new key
-      envContent += `\n${key}=${formatValue(value)}`;
+      // This line is not a key-value pair, keep it (comment or blank line)
+      updatedEnvLines.push(line);
+    }
+    i++;
+  }
+
+  // Add new keys
+  for (const [key, value] of Object.entries(onePasswordSecrets)) {
+    if (!processedKeys.has(key)) {
+      if (updatedEnvLines[updatedEnvLines.length - 1] !== '') {
+        updatedEnvLines.push('');
+      }
+      updatedEnvLines.push(`${key}=${formatValue(value)}`);
       addedSecrets.push(key);
     }
   }
 
-  // Remove any trailing newlines
-  envContent = envContent.replace(/\n+$/, '') + '\n';
+  // Write updated content back to file
+  await fs.writeFile(envPath, updatedEnvLines.join('\n') + '\n');
 
-  await fs.writeFile(envPath, envContent);
 
   if (updatedSecrets.length > 0 || addedSecrets.length > 0) {
-    logger.success(`Secrets synced from 1Password to ${selectedEnvFile}`);
+    logger.info('Secrets synced from 1Password to .env:');
     if (updatedSecrets.length > 0) {
       logger.info(`Updated ${updatedSecrets.length} secret(s): ${updatedSecrets.join(', ')}`);
     }
@@ -245,10 +281,11 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
       logger.info(`Added ${addedSecrets.length} new secret(s): ${addedSecrets.join(', ')}`);
     }
   } else {
-    logger.info('No changes detected, all secrets are up to date.');
+    logger.info('No changes detected, .env file is up to date.');
   }
-}
 
+  logger.success(`Sync from 1Password to ${selectedEnvFile} completed.`);
+}
 
 async function showDifferences(client: Client, vault: VaultOverview, envSecrets: Record<string, string>, selectedEnvFile: string): Promise<void> {
   const config = await loadConfig();
@@ -311,9 +348,13 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
   }
 }
 
-function formatValue(value: string): string {
+
+function formatValue(value: string) {
+  if (typeof value !== 'string') {
+    return value;
+  }
   if (value.includes('\n')) {
-    return `"${value.replace(/\n/g, '\\n')}"`;
+    return `"${value.replace(/\n/g, '\\n')}"`; //TODO: Add better handling for multiline values.
   } else if (value.startsWith('{') && value.endsWith('}')) {
     return `'${value}'`;
   } else if (value.includes(' ') || value.includes('"') || value.includes("'")) {
