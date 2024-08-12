@@ -42,7 +42,7 @@ async function ensureProjectPrefix(): Promise<string> {
  * @param {Record<string, string>} secrets - Secrets from .env file
  * @param {string} selectedEnvFile - Name of the selected .env file
  */
-async function syncEnvToOnePassword(client: Client, vault: VaultOverview, secrets: Record<string, string>, selectedEnvFile: string): Promise<void> {
+async function syncEnvToOnePassword(client: Client, vault: VaultOverview, secrets: Record<string, string>): Promise<void> {
   const config = await loadConfig();
   const mode = await getStorageMode(config);
   const projectPrefix = await ensureProjectPrefix();
@@ -335,7 +335,7 @@ async function syncOnePasswordToEnv(client: Client, vault: VaultOverview, select
  * @param {Record<string, string>} envSecrets - Secrets from .env file
  * @param {string} selectedEnvFile - Name of the selected .env file
  */
-async function showDifferences(client: Client, vault: VaultOverview, envSecrets: Record<string, string>, selectedEnvFile: string): Promise<void> {
+async function showDifferences(client: Client, vault: VaultOverview, envSecrets: Record<string, string>): Promise<void> {
   const config = await loadConfig();
   const mode = await getStorageMode(config);
   const projectPrefix = await ensureProjectPrefix();
@@ -375,17 +375,17 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
     processedKeys.add(key);
     const onePasswordValue = onePasswordSecrets[key];
     if (onePasswordValue === undefined) {
-      diffContent += kleur.red(`- [.env only] ${key}=${formatValue(value)}\n`);
+      diffContent += kleur.red(`- [.env only]  ${key}=${formatValue(value)}\n`);
     } else if (value !== onePasswordValue) {
-      diffContent += kleur.red(`- [.env] ${key}=${formatValue(value)}\n`);
-      diffContent += kleur.green(`+ [1Password] ${key}=${formatValue(onePasswordValue)}\n`);
+      diffContent += kleur.red(`- [.env]  ${key}=${formatValue(value)}\n`);
+      diffContent += kleur.green(`+ [1pass] ${key}=${formatValue(onePasswordValue)}\n`);
     }
   }
 
   // Process keys from 1Password that are not in .env
   for (const [key, value] of Object.entries(onePasswordSecrets)) {
     if (!processedKeys.has(key)) {
-      diffContent += kleur.green(`+ [1Password only] ${key}=${formatValue(value)}\n`);
+      diffContent += kleur.green(`+ [1pass only] ${key}=${formatValue(value)}\n`);
     }
   }
 
@@ -405,7 +405,7 @@ async function showDifferences(client: Client, vault: VaultOverview, envSecrets:
  * @param {string} value - The value to format
  * @returns {string} The formatted value
  */
-function formatValue(value: string) {
+function formatValue(value: string): string {
   if (typeof value !== 'string') {
     return value;
   }

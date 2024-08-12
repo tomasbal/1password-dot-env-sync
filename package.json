@@ -23,7 +23,9 @@
     ".env",
     "onepassword",
     "one password",
-    "1 password"
+    "1 password",
+    "1password dot env sync",
+    "1password .env sync"
   ],
   "engines": {
     "node": ">=20.0.0"

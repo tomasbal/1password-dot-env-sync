@@ -58,7 +58,7 @@ async function main() {
                     // Sync from .env to 1Password
                     logger.info('Syncing from .env to 1Password...');
                     const secrets = await parseEnvSecrets(selectedEnvFile);
-                    await syncEnvToOnePassword(client, vault, secrets, selectedEnvFile);
+                    await syncEnvToOnePassword(client, vault, secrets);
                 } else {
                     // Sync from 1Password to .env
                     logger.info('Syncing from 1Password to .env...');
@@ -93,7 +93,7 @@ async function main() {
 
                 // Show differences
                 logger.info('Showing differences...');
-                await showDifferences(client, vault, secrets, selectedEnvFile);
+                await showDifferences(client, vault, secrets);
             } catch (error) {
                 logger.error(`An error occurred: ${(error as Error).message}`);
             }
