@@ -1,4 +1,6 @@
 # 1Password-ENV Sync
+[![npm version](https://badge.fury.io/js/1password-dot-env-sync.svg)](https://www.npmjs.com/package/1password-dot-env-sync)
+
 
 ## Overview
 
