@@ -31,6 +31,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engineStrict": true,
   "author": "Tomislav Balabanov",
   "license": "MIT",
