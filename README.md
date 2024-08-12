@@ -1,5 +1,3 @@
----
-
 # 1Password-ENV Sync
 
 ## Overview
@@ -91,7 +89,6 @@ This will read the default `.env` file in the root directory and sync the variab
 ### CLI Commands
 
 - `sync`: Syncs the default `.env` file with the 1Password vault.
-- `list`: Lists all secrets in a 1Password vault. - TO BE ADDED
 - `diff`: Compares secrets between the `.env` file and the 1Password vault.
 - `help`: Displays help for a command.
 
