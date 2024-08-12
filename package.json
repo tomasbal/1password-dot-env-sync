@@ -1,6 +1,6 @@
 {
   "name": "1password-dot-env-sync",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sync secrets between .env and 1Password vault",
   "main": "src/index.ts",
   "bin": {
@@ -30,6 +30,9 @@
   ],
   "engines": {
     "node": ">=20.0.0"
+  },
+  "repository": {
+    "url": "https://github.com/tomasbal/1password-dot-env-sync"
   },
   "publishConfig": {
     "access": "public"

@@ -1,5 +1,3 @@
-Here is the fully updated README file:
-
 ---
 
 # 1Password-ENV Sync
