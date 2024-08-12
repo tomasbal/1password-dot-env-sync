@@ -12,7 +12,8 @@
     "watch": "tsc -w",
     "start": "node dist/cli.js",
     "lint": "tsc",
-    "release": "npm release"
+    "ci": "tsc && pnpm run build",
+    "release": "pnpm run ci && changeset publish"
   },
   "keywords": [
     "1password",
