@@ -1,6 +1,6 @@
 {
   "name": "1password-dot-env-sync",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Sync secrets between .env and 1Password vault",
   "main": "src/index.ts",
   "bin": {
