@@ -1,10 +1,10 @@
-# 1Password-ENV Sync
+# 1password .dot env sync
 [![npm version](https://badge.fury.io/js/1password-dot-env-sync.svg)](https://www.npmjs.com/package/1password-dot-env-sync)
 
 
 ## Overview
 
-`1password-env-sync` is a command-line tool that synchronizes secrets between `.env` files and 1Password vaults. This tool allows you to keep your environment variables secure by leveraging 1Password's vault management and syncing capabilities.
+`1password-dot-env-sync` is a command-line tool that synchronizes secrets between `.env` files and 1Password vaults. This tool allows you to keep your environment variables secure by leveraging 1Password's vault management and syncing capabilities.
 
 ## Features
 
