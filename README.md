@@ -21,10 +21,10 @@
 2. **Support sub directory .env files**:
    -  Future releases will support the ability to sync .env files that are in subdirectories within the project root.
 
-3**Vault Creation**:
-    - When the 1Password SDK supports it, we will add the ability to create new vaults directly from the CLI.
+3. **Vault Creation**:
+   - When the 1Password SDK supports it, we will add the ability to create new vaults directly from the CLI.
 
-4**Extended CLI Commands with Flags**:
+4. **Extended CLI Commands with Flags**:
     - We plan to extend the CLI with more commands and flags to enhance the flexibility and usability of the tool.
 
 
