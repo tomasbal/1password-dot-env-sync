@@ -43,7 +43,7 @@
   "license": "MIT",
   "dependencies": {
     "@1password/sdk": "^0.1.1",
-    "@inquirer/prompts": "^5.3.8",
+    "@inquirer/prompts": "^7.0.0",
     "commander": "^12.1.0",
     "diff": "^5.2.0",
     "dotenv": "^16.4.5",
